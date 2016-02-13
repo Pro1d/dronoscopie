@@ -2,6 +2,7 @@ package fr.insatoulouse.stereoshot;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import com.fbessou.sofa.GamePadIOClient.ConnectionStateChangedListener;
 import com.fbessou.sofa.GamePadIOHelper;
@@ -12,11 +13,13 @@ import com.fbessou.sofa.sensor.Sensor;
 
 public class RemoteControllerActivity extends Activity implements ConnectionStateChangedListener, OnCustomMessageReceivedListener {
 	GamePadIOHelper easyIO;
+	TextView text;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_controller);
-		
+		text=(TextView)findViewById(R.id.tv_controller);
 		GamePadInformation info = new GamePadInformation(this);
 		info.setNickname("Controller");
 		easyIO = new GamePadIOHelper(this, info);
@@ -27,27 +30,22 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	}
 	@Override
 	public void onCustomMessageReceived(String customMessage) {
-		// TODO Auto-generated method stub
-		
+		text.setText(text.getText().toString()+"Custom msg: \""+customMessage+"\"\n");
 	}
 	@Override
 	public void onConnectedToProxy() {
-		// TODO Auto-generated method stub
-		
+		text.setText(text.getText().toString()+"Connected to proxy\n");
 	}
 	@Override
 	public void onConnectedToGame() {
-		// TODO Auto-generated method stub
-		
+		text.setText(text.getText().toString()+"Connected to game\n");
 	}
 	@Override
 	public void onDisconnectedFromGame() {
-		// TODO Auto-generated method stub
-		
+		text.setText(text.getText().toString()+"Disconnected from game\n");
 	}
 	@Override
 	public void onDisconnectedFromProxy() {
-		// TODO Auto-generated method stub
-		
+		text.setText(text.getText().toString()+"Disconnected from proxy\n");
 	}
 }

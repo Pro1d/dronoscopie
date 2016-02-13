@@ -16,22 +16,22 @@ public final class R {
 		public static final int stickRadius = 0x7f010004;
 	}
 	public static final class id {
-		public static final int buttonDown = 0x7f060012;
-		public static final int buttonLeft = 0x7f060010;
-		public static final int buttonRight = 0x7f060011;
-		public static final int buttonUp = 0x7f06000f;
-		public static final int button_send = 0x7f06000b;
-		public static final int buttonsContainer = 0x7f06000d;
+		public static final int buttonDown = 0x7f060013;
+		public static final int buttonLeft = 0x7f060011;
+		public static final int buttonRight = 0x7f060012;
+		public static final int buttonUp = 0x7f060010;
+		public static final int button_send = 0x7f06000c;
+		public static final int buttonsContainer = 0x7f06000e;
 		public static final int circle = 0x7f060000;
 		public static final int dynamic = 0x7f060002;
 		public static final int fixed = 0x7f060003;
 		public static final int follow = 0x7f060004;
-		public static final int joystickView = 0x7f06000c;
-		public static final int radioGroup1 = 0x7f060008;
+		public static final int joystickView = 0x7f06000d;
+		public static final int radioGroup1 = 0x7f060009;
 		public static final int rect = 0x7f060001;
-		public static final int send_feedback = 0x7f060009;
-		public static final int send_text = 0x7f06000a;
-		public static final int textOutput = 0x7f06000e;
+		public static final int send_feedback = 0x7f06000a;
+		public static final int send_text = 0x7f06000b;
+		public static final int textOutput = 0x7f06000f;
 	}
 	public static final class layout {
 		public static final int activity_game_listener_sample = 0x7f030002;

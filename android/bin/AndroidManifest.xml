@@ -20,7 +20,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".CameraActivity"
-            android:label="ss-cam" >
+            android:label="ss-cam"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,7 +38,6 @@
             </intent-filter>
         </activity>
         <service android:name="com.fbessou.sofa.GameIOProxy"></service>
-        <service android:name="fr.insatoulouse.stereoshot.ServerService"></service>
     </application>
 
 </manifest>
