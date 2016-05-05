@@ -1,21 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:layout_weight="1" >
 
-    <TextView
-        android:id="@+id/tv_controller"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+	<SurfaceView
+	    android:id="@+id/stereoView"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_weight="1" />
 
-    <Button
-        android:id="@+id/b_capture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Capture" />
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:alpha="0.5"
+	    android:gravity="center"
+	    android:orientation="vertical" >
 
-</LinearLayout>
+		<SeekBar
+		    android:id="@+id/sb_correction_fov_contr"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_weight="0"
+		    android:max="1000"
+		    android:progress="500" />
+
+	    <TextView
+	        android:id="@+id/tv_controller"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:textColor="#FF00FF" />
+
+	    <Button
+	        android:id="@+id/b_capture_cam"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Capture" />
+	</LinearLayout>
+</RelativeLayout>

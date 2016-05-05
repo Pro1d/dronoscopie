@@ -41,9 +41,9 @@ public class CameraHelper implements Callback {
 		jpegCallback = new PictureCallback() {
 			public void onPictureTaken(byte[] data, Camera camera) {
 				// Re-enable preview
-				// camera.startPreview();
-				// cameraPreviewIsEnable = true;
-
+				camera.startPreview();
+				cameraPreviewIsEnable = true;
+				
 				if (listener != null)
 					listener.onPhotoTaken(data);
 			}
@@ -67,13 +67,15 @@ public class CameraHelper implements Callback {
 		}
 	}
 
-	public void performCapture() {
+	public boolean performCapture() {
 		// Take a picture if the camera is ready
 		if (cameraIsOn && cameraPreviewIsEnable && !cameraIsAutoFocusState) {
 			camera.takePicture(null, null, jpegCallback);
 			// the camera preview has been disabled by takePicture()
 			cameraPreviewIsEnable = false;
+			return true;
 		}
+		return false;
 	}
 
 	public void enableAutoFocusOnClickSurfaceView() {
@@ -128,7 +130,7 @@ public class CameraHelper implements Callback {
 
 	/** Select appropriate the picture size according to the preview size **/
 	private Camera.Size selectPictureSize(Camera.Size preview) {
-		// ratio of the preview image
+		// ratio of the preview imageBitmap
 		float ratioPreview = (float) preview.width / preview.height;
 
 		// get the list of available sizes for picture

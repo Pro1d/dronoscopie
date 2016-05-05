@@ -20,6 +20,45 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="14dp"
         android:layout_marginRight="14dp"
-        android:text="Start service" />
+        android:text="Start serveur" />
+
+    <Button
+        android:id="@+id/b_capture_cam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/start_service"
+        android:layout_alignLeft="@+id/start_service"
+        android:layout_alignRight="@+id/start_service"
+        android:text="Capture" />
+
+
+    <FrameLayout
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="#F00" >
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="134dp"
+        android:background="#F00" >
+
+    </FrameLayout>
+
+    <CheckBox
+        android:id="@+id/switch_side_cam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+        android:checked="false"
+        android:text="left/right"
+        android:layout_marginBottom="14dp"
+        android:layout_marginRight="14dp" />
 
 </RelativeLayout>
