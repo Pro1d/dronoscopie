@@ -12,25 +12,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
 
-    <Button
-        android:id="@+id/start_service"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="14dp"
-        android:layout_marginRight="14dp"
-        android:text="Start serveur" />
-
-    <Button
-        android:id="@+id/b_capture_cam"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/start_service"
-        android:layout_alignLeft="@+id/start_service"
-        android:layout_alignRight="@+id/start_service"
-        android:text="Capture" />
-
 
     <FrameLayout
         android:layout_width="1dp"
@@ -60,5 +41,15 @@
         android:text="left/right"
         android:layout_marginBottom="14dp"
         android:layout_marginRight="14dp" />
+
+    <Button
+        android:id="@+id/b_capture_cam"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:text="Capture" />
 
 </RelativeLayout>

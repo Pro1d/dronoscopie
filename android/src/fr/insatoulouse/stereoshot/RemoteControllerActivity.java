@@ -9,29 +9,33 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.fbessou.sofa.GameIOHelper.GamePadCustomMessage;
 import com.fbessou.sofa.GamePadIOClient.ConnectionStateChangedListener;
 import com.fbessou.sofa.GamePadIOHelper;
 import com.fbessou.sofa.GamePadIOHelper.OnCustomMessageReceivedListener;
 import com.fbessou.sofa.GamePadInformation;
 import com.fbessou.sofa.sensor.KeySensor;
 import com.fbessou.sofa.sensor.Sensor;
+
+import fr.insatoulouse.stereoshot.IServer.OnCustomMessageReceivedByControllerListener;
 /************ Controller activity ***********
  * Log and command for camera
  * Client 'controller', auto connect to server
  * 
- * CustomMessage:
+ * CustomMessage from IServer's interface:
  * 		{type:string="log",text:string} -> display text on textview
  * 		{type:string="camera",side:int=CameraActivity.LEFT/RIGHT,message:string=JSONObject}
  * 			->message:{type:string="image",image:string=<-constructor Image.class}
  */
-public class RemoteControllerActivity extends Activity implements ConnectionStateChangedListener, OnCustomMessageReceivedListener {
+public class RemoteControllerActivity extends Activity implements ConnectionStateChangedListener, OnCustomMessageReceivedListener, OnCustomMessageReceivedByControllerListener {
 	GamePadIOHelper easyIO;
 	TextView text;
 	SurfaceView surfaceViewer;
@@ -41,6 +45,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	Image imgRight, imgLeft;
 	float fovCorrectionScale;
+	IServer server = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,32 +66,85 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 		});
 		surfaceViewer = (SurfaceView) findViewById(R.id.stereoView);
 		holderViewer = surfaceViewer.getHolder();
+		
+		/** Client **/
 		GamePadInformation info = new GamePadInformation(this);
 		info.setNickname("controller");
 		easyIO = new GamePadIOHelper(this, info);
 		easyIO.start(this);
 		easyIO.setOnCustomMessageReceivedListener(this);
-		
 		easyIO.attachSensor(new KeySensor(Sensor.KEY_CATEGORY_VALUE+1, findViewById(R.id.b_capture_cam)));
+		
+		/** server **/
+		server = new IServer(RemoteControllerActivity.this, this);
+		hideSystemUI();
 	}
 	@Override
-	public void onCustomMessageReceived(String customMessage) {
+	public void onCustomMessageReceivedByController(GamePadCustomMessage m, int side) {
 		try {
-			JSONObject o = new JSONObject(customMessage);
+			JSONObject o = new JSONObject(m.customMessage);
 			switch(o.getString("type")) {
 			case "log":
 				printTextLog(o.getString("text"));
 				break;
-			case "camera":
-				JSONObject inner = new JSONObject(o.getString("message"));
-				if(inner.getString("type").equals("image"))
-					onImageReceived(o.getInt("side"), inner.getString("image"));
+			case "image":
+				onImageReceived(side, o.getString("image"));
 				break;
 			}
 		} catch(JSONException e) {
 			e.printStackTrace();
 		}
 	}
+	// This snippet hides the system bars.
+	private void hideSystemUI() {
+	    // Set the IMMERSIVE flag.
+	    // Set the content to appear under the system bars so that the content
+	    // doesn't resize when the system bars hide and show.
+		this.getWindow().getDecorView().setSystemUiVisibility(
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+	}
+
+	// This snippet shows the system bars. It does this by removing all the flags
+	// except for the ones that make the content appear under the system bars.
+	private void showSystemUI() {
+		this.getWindow().getDecorView().setSystemUiVisibility(
+	            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+	            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+	            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch(keyCode) {
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			JSONObject j = new JSONObject();
+			try {
+				j.put("type", "capture");
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			easyIO.sendCustomMessage(j.toString());
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			View v= findViewById(R.id.ll_overlay);
+			if(v.getVisibility()==View.VISIBLE) {
+				v.setVisibility(View.GONE);
+				hideSystemUI();
+			}
+			else {
+				v.setVisibility(View.VISIBLE);
+				//showSystemUI();
+			}
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+	
 	void drawImages() {
 		Canvas canvas = holderViewer.lockCanvas();
 		if(canvas == null)
@@ -170,6 +228,11 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	}
 	private void clearTextLog() {
 		text.setText("");
+	}
+	@Override
+	public void onCustomMessageReceived(String customMessage) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

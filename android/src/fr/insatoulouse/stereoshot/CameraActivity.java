@@ -46,7 +46,6 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
     
 	boolean connectedToServer = false;
 	
-	IServer server = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +74,6 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
 					SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-kk-mm-ss-SSS");
 					nextFileName = "manual_" + sdf.format(new Date()) + ".jpg";
 				}
-			}
-		});
-		findViewById(R.id.start_service).setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(server == null)
-					server = new IServer(CameraActivity.this);
 			}
 		});
 	}

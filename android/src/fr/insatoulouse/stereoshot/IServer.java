@@ -42,10 +42,12 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 	SparseIntArray cameraSide = new SparseIntArray();
 	int captureCount = 0;
 	Activity activity;
-	IServer(Activity a) {
+	OnCustomMessageReceivedByControllerListener listener;
+	IServer(Activity a, OnCustomMessageReceivedByControllerListener l) {
 		activity = a;
 		serverIO = new GameIOHelper(a, new GameInformation(a), this, this, this);
 		serverIO.start(this);
+		listener = l;
 		//CameraActivity.this.startService(new Intent(CameraActivity.this, ServerService.class));
 	}
 	void sendLogMessageToController(String msg) {
@@ -61,17 +63,7 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 		}
 	}
 	void transmitCustomMessageToController(GamePadCustomMessage m) {
-		if(controllerPadId != -1) {
-			JSONObject json = new JSONObject();
-			try {
-				json.put("type", "camera");
-				json.put("side", ""+cameraSide.get(m.gamePadId));
-				json.put("message", m.customMessage);
-			} catch(JSONException e) {
-				e.printStackTrace();
-			}
-			serverIO.sendCustomMessage(json.toString(), controllerPadId);
-		}
+		listener.onCustomMessageReceivedByController(m, cameraSide.get(m.gamePadId));
 	}
 	
 	@Override
@@ -96,7 +88,8 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 				JSONObject o = new JSONObject(message.customMessage);
 				switch(o.getString("type")) {
 				case "capture":
-					
+					sendCaptureRequest();
+					break;
 				}
 			} catch(JSONException e) {
 				e.printStackTrace();
@@ -141,25 +134,13 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 		}
 	}
 
-	@SuppressLint("SimpleDateFormat")
 	@Override
 	public void onInputEvent(GamePadInputEvent event) {
 		//if(serverIO.getGamePadInformation(event.gamePadId).staticInformations.getNickname()=="Controller") {
 			if(event.gamePadId == controllerPadId
 					&& event.event.padId == Sensor.KEY_CATEGORY_VALUE+1
 					&& event.event.eventType == com.fbessou.sofa.InputEvent.Type.KEYDOWN) {
-				try {
-					JSONObject o = new JSONObject();
-					o.put("action", "capture");
-					SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-kk-mm-ss-SSS");
-					String seq_name = "capture";
-					String filename = seq_name + "_" + sdf.format(new Date()) + ".jpg";
-					o.put("filename", filename);
-					captureCount++;
-					serverIO.sendCustomMessageBroadcast(o.toString());
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+				sendCaptureRequest();
 			}
 			else if(event.gamePadId != controllerPadId
 					&& event.event.padId == Sensor.KEY_CATEGORY_VALUE+2) {
@@ -168,6 +149,21 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 				sendLogMessageToController("Camera "+event.gamePadId+" is now on "+(side==CameraActivity.LEFT?"left":"right")+" side");
 			}
 		//}
+	}
+	@SuppressLint("SimpleDateFormat")
+	private void sendCaptureRequest() {
+		try {
+			JSONObject o = new JSONObject();
+			o.put("action", "capture");
+			SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-kk-mm-ss-SSS");
+			String seq_name = "capture";
+			String filename = seq_name + "_" + sdf.format(new Date()) + ".jpg";
+			o.put("filename", filename);
+			captureCount++;
+			serverIO.sendCustomMessageBroadcast(o.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -188,5 +184,9 @@ class IServer implements InputEventListener, StateChangedEventListener, CustomMe
 		sp.getInt("repeat-delay", 1000);// temps entre les captures
 		sp.getInt("repeat-count", -1);// nombre de répétition, -1 = infini
 		sp.getString("seq-name", "capture"); // nom de la séquence de photo, présent dans le nom des fichiers	
+	}
+
+	public interface OnCustomMessageReceivedByControllerListener {
+		public void onCustomMessageReceivedByController(GamePadCustomMessage m, int side);
 	}
 }
