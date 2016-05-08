@@ -144,47 +144,55 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-	
+	Thread lastThread=null;
 	void drawImages() {
-		Canvas canvas = holderViewer.lockCanvas();
-		if(canvas == null)
-			return;
-		for(int side = 0; side < 2; side++) {
-			Image img = (side == CameraActivity.LEFT ? imgLeft : imgRight);
-			if(img == null)
-				continue;
-			Bitmap image = img.getJpegBitmap();
-			
-			if(bufBitmap == null || canvas.getHeight() != bufBitmap.getHeight() || canvas.getWidth() != bufBitmap.getWidth()) {
-				bufBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
-				bufCanvas = new Canvas(bufBitmap);
-			}
-			// draw on left or right side
-			int width = canvas.getWidth()/2, height = canvas.getHeight();
-			float ratio = (float)width / height;
-			float fovCorrectionScale = 1.0f - (side == 1 ? 
-					(this.fovCorrectionScale < 0 ? -this.fovCorrectionScale : 0) : 
-						(this.fovCorrectionScale > 0 ? this.fovCorrectionScale : 0));
-			
-			float imgWidth = image.getWidth() * fovCorrectionScale;
-			float imgHeight = image.getHeight() * fovCorrectionScale;
-			// Correct ratio
-			if(imgWidth/imgHeight > ratio)
-				imgWidth = imgHeight * ratio;
-			else
-				imgHeight = imgWidth / ratio;
+		if(lastThread != null && lastThread.isAlive())
+			lastThread.interrupt();
+		(lastThread=new Thread() {
+			@Override
+			public void run() {
+				Canvas canvas = holderViewer.lockCanvas();
+				if(canvas == null)
+					return;
+				for(int side = 0; side < 2; side++) {
+					Image img = (side == CameraActivity.LEFT ? imgLeft : imgRight);
+					if(img == null)
+						continue;
+					Bitmap image = img.getJpegBitmap();
+					
+					if(bufBitmap == null || canvas.getHeight() != bufBitmap.getHeight() || canvas.getWidth() != bufBitmap.getWidth()) {
+						bufBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
+						bufCanvas = new Canvas(bufBitmap);
+					}
+					// draw on left or right side
+					int width = canvas.getWidth()/2, height = canvas.getHeight();
+					float ratio = (float)width / height;
+					float fovCorrectionScale = 1.0f - (side == 1 ? 
+							(RemoteControllerActivity.this.fovCorrectionScale < 0 ? -RemoteControllerActivity.this.fovCorrectionScale : 0) : 
+								(RemoteControllerActivity.this.fovCorrectionScale > 0 ? RemoteControllerActivity.this.fovCorrectionScale : 0));
+					
+					float imgWidth = image.getWidth() * fovCorrectionScale;
+					float imgHeight = image.getHeight() * fovCorrectionScale;
+					// Correct ratio
+					if(imgWidth/imgHeight > ratio)
+						imgWidth = imgHeight * ratio;
+					else
+						imgHeight = imgWidth / ratio;
 
-			Rect src = new Rect(
-					(int)((image.getWidth() -imgWidth) /2),
-					(int)((image.getHeight()-imgHeight)/2),
-					(int)((image.getWidth() +imgWidth) /2),
-					(int)((image.getHeight()+imgHeight)/2));
-			Rect dst = new Rect(side*width,0,width+(side*width),height);
-			bufCanvas.drawBitmap(image, src, dst, paint);
-			// update view
-			canvas.drawBitmap(bufBitmap, 0, 0, null);
-		}
-		holderViewer.unlockCanvasAndPost(canvas);
+					Rect src = new Rect(
+							(int)((image.getWidth() -imgWidth) /2),
+							(int)((image.getHeight()-imgHeight)/2),
+							(int)((image.getWidth() +imgWidth) /2),
+							(int)((image.getHeight()+imgHeight)/2));
+					Rect dst = new Rect(side*width,0,width+(side*width),height);
+					CardBoard.drawWithDistortion(image, src, dst, bufCanvas);
+					//bufCanvas.drawBitmap(image, src, dst, paint);
+					// update view
+					canvas.drawBitmap(bufBitmap, 0, 0, null);
+				}
+				holderViewer.unlockCanvasAndPost(canvas);
+			}
+		}).start();
 	}
 	public void onImageReceived(final int side, final String jpegBase64) {
 		clearTextLog();
