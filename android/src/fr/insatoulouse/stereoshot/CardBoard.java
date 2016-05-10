@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 public class CardBoard {
-	public static double scale = 0.90, shape = 0.7; 
+	public static double scale = 0.50, shape = 0.5, deltaScale = 0, deltaShape = 0; 
 	public static void drawWithDistortion(Bitmap image, Rect src, Rect dst, Canvas canvas) {
 		int w = dst.width(), h = dst.height();
 		int[] pixels = new int[src.width()*src.height()];
@@ -19,7 +19,7 @@ public class CardBoard {
 		 * Fish eye effect tejopa, 2012-04-29 http://popscan.blogspot.com
 		 * http://www.eemeli.de
 		 */
-		double k = scale, l = shape;
+		double k = scale+deltaScale, l = shape+deltaShape;
 		// create the result data
 		int[] dstpixels = new int[(int) (w * h)];
 		// for each row

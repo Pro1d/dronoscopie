@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -44,7 +45,8 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	Bitmap bufBitmap;
 	Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	Image imgRight, imgLeft;
-	float fovCorrectionScale;
+	float fovCorrectionScale = 0.0f;
+	float distance = 0.0f;
 	IServer server = null;
 	
 	@Override
@@ -57,11 +59,54 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
-				float newScale = x * 0.2f;
+				float newScale = x * 0.5f;
 				if(fovCorrectionScale != newScale) {
 					fovCorrectionScale = newScale;
+					Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
+					Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
+					Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
+					Log.i("VALUE","distance="+distance);
 					drawImages();
 				}
+			}
+		});
+		((SeekBar)findViewById(R.id.sb_zoom_contr)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override public void onStopTrackingTouch(SeekBar seekBar) { }
+			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
+			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
+				CardBoard.deltaScale = x*0.5f;
+				Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
+				Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
+				Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
+				Log.i("VALUE","distance="+distance);
+				drawImages();
+			}
+		});
+		((SeekBar)findViewById(R.id.sb_distortion_contr)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override public void onStopTrackingTouch(SeekBar seekBar) { }
+			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
+			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
+				CardBoard.deltaShape = x*0.5f;
+				Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
+				Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
+				Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
+				Log.i("VALUE","distance="+distance);
+				drawImages();
+			}
+		});
+		((SeekBar)findViewById(R.id.sb_inter_contr)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override public void onStopTrackingTouch(SeekBar seekBar) { }
+			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
+			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
+				distance = x*0.5f + 0.1f;
+				Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
+				Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
+				Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
+				Log.i("VALUE","distance="+distance);
+				drawImages();
 			}
 		});
 		surfaceViewer = (SurfaceView) findViewById(R.id.stereoView);
@@ -184,7 +229,8 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 							(int)((image.getHeight()-imgHeight)/2),
 							(int)((image.getWidth() +imgWidth) /2),
 							(int)((image.getHeight()+imgHeight)/2));
-					Rect dst = new Rect(side*width,0,width+(side*width),height);
+					int offsetX = +(int)((side*2-1)*width*distance);
+					Rect dst = new Rect(side*width+offsetX,0,width+(side*width)+offsetX,height);
 					CardBoard.drawWithDistortion(image, src, dst, bufCanvas);
 					//bufCanvas.drawBitmap(image, src, dst, paint);
 					// update view
@@ -202,8 +248,14 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			public void run() {
 				Image img = new Image(jpegBase64);
 				
-				if(side == CameraActivity.LEFT) imgLeft = img;
-				else imgRight = img;
+				if(side == CameraActivity.LEFT) {
+					if(imgLeft != null && imgLeft.imageBitmap != null) imgLeft.imageBitmap.recycle();
+					imgLeft = img;
+				}
+				else {
+					if(imgRight != null && imgRight.imageBitmap != null) imgRight.imageBitmap.recycle();
+					imgRight = img;
+				}
 				
 				Bitmap image = img.getJpegBitmap();
 				if(image == null)
