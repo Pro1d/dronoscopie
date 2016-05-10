@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import com.fbessou.sofa.sensor.KeySensor;
 import com.fbessou.sofa.sensor.Sensor;
 
 import fr.insatoulouse.stereoshot.IServer.OnCustomMessageReceivedByControllerListener;
+import fr.insatoulouse.stereoshot.camera.FileManager;
 /************ Controller activity ***********
  * Log and command for camera
  * Client 'controller', auto connect to server
@@ -48,6 +50,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	float fovCorrectionScale = 0.0f;
 	float distance = 0.0f;
 	IServer server = null;
+	FileManager fileMng = new FileManager("StereoShot");
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +78,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
-				CardBoard.deltaScale = x*0.5f;
+				CardBoard.deltaScale = -x*0.5f;
 				Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
 				Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
 				Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
@@ -101,12 +104,18 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			@Override public void onStartTrackingTouch(SeekBar seekBar) { }
 			@Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				float x = (float)(progress - seekBar.getMax()/2) / seekBar.getMax();
-				distance = x*0.5f + 0.1f;
+				distance = x*0.3f + 0.0f;
 				Log.i("VALUE","fovCorrectionScale="+fovCorrectionScale);
 				Log.i("VALUE","CardBoard.deltaScale="+CardBoard.deltaScale);
 				Log.i("VALUE","CardBoard.deltaShape="+CardBoard.deltaShape);
 				Log.i("VALUE","distance="+distance);
 				drawImages();
+			}
+		});
+		findViewById(R.id.b_save).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// TODO <3
 			}
 		});
 		surfaceViewer = (SurfaceView) findViewById(R.id.stereoView);
