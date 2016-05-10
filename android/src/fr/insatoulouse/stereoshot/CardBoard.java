@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 
 public class CardBoard {
-	public static double scale = 0.50, shape = 0.5, deltaScale = 0, deltaShape = 0; 
+	public static double scale = 0.50-0.076, shape = 0.25, deltaScale = 0, deltaShape = 0.0; 
 	public static void drawWithDistortion(Bitmap image, Rect src, Rect dst, Canvas canvas) {
 		int w = dst.width(), h = dst.height();
 		int[] pixels = new int[src.width()*src.height()];
