@@ -1,5 +1,9 @@
 package fr.insatoulouse.stereoshot;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Date;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,15 +13,18 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fbessou.sofa.GameIOHelper.GamePadCustomMessage;
 import com.fbessou.sofa.GamePadIOClient.ConnectionStateChangedListener;
@@ -56,6 +63,8 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_controller);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 		text=(TextView)findViewById(R.id.tv_controller);
 		((SeekBar)findViewById(R.id.sb_correction_fov_contr)).setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			@Override public void onStopTrackingTouch(SeekBar seekBar) { }
@@ -115,7 +124,32 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 		findViewById(R.id.b_save).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO <3
+			    Date now = new Date();
+			    android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+			    try {
+			        // image naming and path  to include sd card  appending name you choose for file
+			        String mPath = Environment.getExternalStorageDirectory().toString() + "/StereoShot/stereo_" + now + ".jpg";
+			        
+			        Bitmap bitmap = Bitmap.createBitmap(bufBitmap);
+
+			        File imageFile = new File(mPath);
+
+			        FileOutputStream outputStream = new FileOutputStream(imageFile);
+			        int quality = 100;
+			        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+			        Toast.makeText(RemoteControllerActivity.this, "Saved in"+mPath, Toast.LENGTH_SHORT).show();
+			        outputStream.flush();
+			        outputStream.close();
+			    } catch (Throwable e) {
+			        e.printStackTrace();
+			    }
+			}
+		});
+		findViewById(R.id.b_capture_cam).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+			    Toast.makeText(RemoteControllerActivity.this, "Capture request!", Toast.LENGTH_SHORT).show();
 			}
 		});
 		surfaceViewer = (SurfaceView) findViewById(R.id.stereoView);
@@ -208,6 +242,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 				Canvas canvas = holderViewer.lockCanvas();
 				if(canvas == null)
 					return;
+				canvas.drawColor(0xFF000000);
 				for(int side = 0; side < 2; side++) {
 					Image img = (side == CameraActivity.LEFT ? imgLeft : imgRight);
 					if(img == null)

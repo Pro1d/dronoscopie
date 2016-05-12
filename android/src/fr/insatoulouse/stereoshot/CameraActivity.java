@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Toast;
 
@@ -51,6 +52,7 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		/** Initialize the camera **/
 		cameraSurfaceView = (SurfaceView) findViewById(R.id.surfaceViewCamera);

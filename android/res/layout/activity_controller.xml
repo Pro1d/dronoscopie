@@ -34,7 +34,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:text="FoV Corr"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#FFF" 
+                    android:shadowColor="#000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="2.0"/>
 
                 <SeekBar
                     android:id="@+id/sb_correction_fov_contr"
@@ -56,7 +61,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:text="Distortion"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium" 
+                    android:textColor="#FFF" 
+                    android:shadowColor="#000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="2.0"/>
 
                 <SeekBar
                     android:id="@+id/sb_distortion_contr"
@@ -78,7 +88,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:text="Ecartement"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium" 
+                    android:textColor="#FFF" 
+                    android:shadowColor="#000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="2.0"/>
 
                 <SeekBar
                     android:id="@+id/sb_inter_contr"
@@ -100,7 +115,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0"
                     android:text="Taille"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="#FFF" 
+                    android:shadowColor="#000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="2.0" />
 
                 <SeekBar
                     android:id="@+id/sb_zoom_contr"
@@ -136,6 +156,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Enregistrer" />
+
         </LinearLayout>
     </LinearLayout>
 
