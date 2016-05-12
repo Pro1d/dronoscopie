@@ -71,11 +71,9 @@ public class CardBoard {
 						int y2 = (int) ((nyn + 1.0) * h_src_2);
 						// make sure that position stays within arrays
 						if (0<=y2 && y2 < h_src && 0<=x2 && x2<w_src) {
-							// find (x2,y2) position from source pixels
-							int srcpos = (int) (y2 * w_src + x2);
 							// get new pixel (x2,y2) and put it to target array
 							// at (x,y)
-							dstpixels[(int) (y * w + x)] = srcpixels[srcpos];
+							dstpixels[(int) (y * w + x)] = srcpixels[y2 * w_src + x2];
 						}
 						else
 							dstpixels[(int)(y * w + x)] = 0;
