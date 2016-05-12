@@ -2,11 +2,13 @@ package fr.insatoulouse.stereoshot;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -122,10 +124,11 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			}
 		});
 		findViewById(R.id.b_save).setOnClickListener(new OnClickListener() {
+			@SuppressLint("SimpleDateFormat")
 			@Override
 			public void onClick(View v) {
-			    Date now = new Date();
-			    android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+				SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-kk-mm-ss-SSS");
+				String now = "manual_" + sdf.format(new Date()) + ".jpg";
 
 			    try {
 			        // image naming and path  to include sd card  appending name you choose for file
@@ -138,9 +141,9 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			        FileOutputStream outputStream = new FileOutputStream(imageFile);
 			        int quality = 100;
 			        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
-			        Toast.makeText(RemoteControllerActivity.this, "Saved in"+mPath, Toast.LENGTH_SHORT).show();
 			        outputStream.flush();
 			        outputStream.close();
+			        Toast.makeText(RemoteControllerActivity.this, "Saved in"+mPath, Toast.LENGTH_SHORT).show();
 			    } catch (Throwable e) {
 			        e.printStackTrace();
 			    }
@@ -242,7 +245,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 				Canvas canvas = holderViewer.lockCanvas();
 				if(canvas == null)
 					return;
-				canvas.drawColor(0xFF000000);
+				if(bufCanvas != null) bufCanvas.drawColor(0xFF000000);
 				for(int side = 0; side < 2; side++) {
 					Image img = (side == CameraActivity.LEFT ? imgLeft : imgRight);
 					if(img == null)
