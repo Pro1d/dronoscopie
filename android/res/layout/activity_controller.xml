@@ -156,6 +156,12 @@
                 android:layout_height="wrap_content"
                 android:text="Enregistrer" />
 
+            <Button
+                android:id="@+id/b_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inverser" />
+
         </LinearLayout>
     </LinearLayout>
 

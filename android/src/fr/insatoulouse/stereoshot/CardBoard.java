@@ -6,14 +6,14 @@ import android.graphics.Rect;
 
 public class CardBoard {
 	public static double scale = 0.50-0.076, shape = 0.25, deltaScale = 0, deltaShape = 0.0; 
-	public static void drawWithDistortion(Bitmap image, Rect src, Rect dst, Canvas canvas) {
+	public static void drawWithDistortion(Bitmap image, Rect src, Rect dst, Canvas canvas, boolean rotate) {
 		int w = dst.width(), h = dst.height();
 		int[] pixels = new int[src.width()*src.height()];
 		image.getPixels(pixels, 0, src.width(), src.left, src.top, src.width(), src.height());
-		int[] out = fisheye(pixels, w,h, src.width(),src.height());
+		int[] out = fisheye(pixels, w,h, src.width(),src.height(), rotate);
 		canvas.drawBitmap(out, 0, w, dst.left, dst.top, dst.width(), dst.height(), false, null);
 	}
-	public static int[] fisheye(int[] srcpixels, double w, double h, int w_src, int h_src) {
+	public static int[] fisheye(int[] srcpixels, double w, double h, int w_src, int h_src, boolean rotate) {
 
 		/*
 		 * Fish eye effect tejopa, 2012-04-29 http://popscan.blogspot.com
@@ -73,6 +73,10 @@ public class CardBoard {
 						if (0<=y2 && y2 < h_src && 0<=x2 && x2<w_src) {
 							// get new pixel (x2,y2) and put it to target array
 							// at (x,y)
+							if(rotate) {
+								x2 = w_src-x2-1;
+								y2 = h_src-y2-1;
+							}
 							dstpixels[(int) (y * w + x)] = srcpixels[y2 * w_src + x2];
 						}
 						else

@@ -60,6 +60,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 	float distance = 0.0f;
 	IServer server = null;
 	FileManager fileMng = new FileManager("StereoShot");
+	int configuration = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +156,13 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 			    Toast.makeText(RemoteControllerActivity.this, "Capture request!", Toast.LENGTH_SHORT).show();
 			}
 		});
+		findViewById(R.id.b_switch).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				configuration = 1-configuration;
+				drawImages();
+			}
+		});
 		surfaceViewer = (SurfaceView) findViewById(R.id.stereoView);
 		holderViewer = surfaceViewer.getHolder();
 		
@@ -247,7 +255,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 					return;
 				if(bufCanvas != null) bufCanvas.drawColor(0xFF000000);
 				for(int side = 0; side < 2; side++) {
-					Image img = (side == CameraActivity.LEFT ? imgLeft : imgRight);
+					Image img = ((side+configuration)%2 == CameraActivity.LEFT ? imgLeft : imgRight);
 					if(img == null)
 						continue;
 					Bitmap image = img.getJpegBitmap();
@@ -278,7 +286,7 @@ public class RemoteControllerActivity extends Activity implements ConnectionStat
 							(int)((image.getHeight()+imgHeight)/2));
 					int offsetX = +(int)((side*2-1)*width*distance);
 					Rect dst = new Rect(side*width+offsetX,0,width+(side*width)+offsetX,height);
-					CardBoard.drawWithDistortion(image, src, dst, bufCanvas);
+					CardBoard.drawWithDistortion(image, src, dst, bufCanvas, (configuration+side)%2==1);
 					//bufCanvas.drawBitmap(image, src, dst, paint);
 					// update view
 					canvas.drawBitmap(bufBitmap, 0, 0, null);
