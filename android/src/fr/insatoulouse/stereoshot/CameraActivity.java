@@ -26,15 +26,12 @@ import com.fbessou.sofa.sensor.Sensor;
 import fr.insatoulouse.stereoshot.camera.CameraHelper;
 import fr.insatoulouse.stereoshot.camera.CameraHelper.OnImageListener;
 import fr.insatoulouse.stereoshot.camera.FileManager;
-/************ Activity camera *************
- * Must be launched on embedded smartphones
- * Client 'camera', auto connect to server
- * CustomMessage:
- * 		JSON {action:string=capture} -> take imageBitmap, save on local storage, send message "I took picture." to server
- * UI:
- * 		camera preview
- * 		button 'start server'
- * 		button 'photo manually'
+
+/************
+ * Activity camera ************* Must be launched on embedded smartphones Client
+ * 'camera', auto connect to server CustomMessage: JSON {action:string=capture}
+ * -> take imageBitmap, save on local storage, send message "I took picture." to
+ * server UI: camera preview button 'start server' button 'photo manually'
  * 
  */
 public class CameraActivity extends Activity implements OnImageListener, OnCustomMessageReceivedListener, ConnectionStateChangedListener {
@@ -44,35 +41,34 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
 	GamePadIOHelper easyIO;
 	FileManager fileMng = new FileManager("StereoShot");
 	String nextFileName = "default.jpg";
-    
+
 	boolean connectedToServer = false;
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		
+
 		/** Initialize the camera **/
 		cameraSurfaceView = (SurfaceView) findViewById(R.id.surfaceViewCamera);
 		camera = new CameraHelper(cameraSurfaceView);
 		camera.setOnImageListener(this);
 		camera.enableAutoFocusOnClickSurfaceView();
-		
+
 		/** SOFA **/
 		GamePadInformation info = new GamePadInformation(this);
 		info.setNickname("camera");
 		easyIO = new GamePadIOHelper(this, info);
 		easyIO.start(this);
 		easyIO.setOnCustomMessageReceivedListener(this);
-		easyIO.attachSensor(new KeySensor(Sensor.KEY_CATEGORY_VALUE+2, (CheckBox)findViewById(R.id.switch_side_cam)));
-		
+		easyIO.attachSensor(new KeySensor(Sensor.KEY_CATEGORY_VALUE + 2, (CheckBox) findViewById(R.id.switch_side_cam)));
+
 		findViewById(R.id.b_capture_cam).setOnClickListener(new OnClickListener() {
 			@SuppressLint("SimpleDateFormat")
 			@Override
 			public void onClick(View v) {
-				if(camera.performCapture()) {
+				if (camera.performCapture()) {
 					SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd-kk-mm-ss-SSS");
 					nextFileName = "manual_" + sdf.format(new Date()) + ".jpg";
 				}
@@ -80,44 +76,44 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
 		});
 	}
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        camera.resume();
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
+		camera.resume();
+	}
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        camera.pause();
-    }
-	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		camera.pause();
+	}
+
 	/** Called when a picture has been taken and saved to jpeg **/
-    public void onPhotoTaken(byte[] jpegData) {
-    	Toast.makeText(this, "Photo taken!", Toast.LENGTH_SHORT).show();
-    	if(connectedToServer) {
-    		Image img = new Image(jpegData);
-	    	try {
-	    		// Might take a while
+	public void onPhotoTaken(byte[] jpegData) {
+		Toast.makeText(this, "Photo taken!", Toast.LENGTH_SHORT).show();
+		if (connectedToServer) {
+			Image img = new Image(jpegData);
+			try {
+				// Might take a while
 				JSONObject json = img.createJSON();
-		    	easyIO.sendCustomMessage(json.toString());
+				easyIO.sendCustomMessage(json.toString());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-    	} else {
-        	Toast.makeText(this, "Save in "+nextFileName, Toast.LENGTH_SHORT).show();
-    		fileMng.writeFileAsync(jpegData, nextFileName);
-    	}
-    }
+		} else {
+			Toast.makeText(this, "Save in " + nextFileName, Toast.LENGTH_SHORT).show();
+			fileMng.writeFileAsync(jpegData, nextFileName);
+		}
+	}
 
 	@Override
 	public void onCustomMessageReceived(String customMessage) {
 		try {
 			JSONObject o = new JSONObject(customMessage);
 
-			if(o.getString("action").equals("capture")) {
+			if (o.getString("action").equals("capture")) {
 				nextFileName = o.getString("filename");
-				camera.performCapture();				
+				camera.performCapture();
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -126,18 +122,20 @@ public class CameraActivity extends Activity implements OnImageListener, OnCusto
 
 	@Override
 	public void onConnectedToProxy() {
-		
+
 	}
 
 	@Override
 	public void onConnectedToGame() {
 		connectedToServer = true;
-		((CheckBox)findViewById(R.id.switch_side_cam)).setChecked(false);
+		Toast.makeText(this, "Connected to game", Toast.LENGTH_SHORT).show();
+		// ((CheckBox)findViewById(R.id.switch_side_cam)).setChecked(false);
 	}
 
 	@Override
 	public void onDisconnectedFromGame() {
 		connectedToServer = false;
+		Toast.makeText(this, "Disconnected to game", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
